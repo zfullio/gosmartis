@@ -1,4 +1,4 @@
-package smartis
+package gosmartis
 
 import (
 	"bytes"

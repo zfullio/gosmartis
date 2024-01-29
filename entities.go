@@ -312,9 +312,15 @@ func (p *Payload) convert() map[string]interface{} {
 		"datetimeTo":   p.DateTimeTo.Format("2006-01-02"),
 		"groupBy":      p.GroupBy,
 		"type":         p.TypeReport,
-		"filters":      p.Filters,
-		"fields":       strings.Join(p.Fields, ";"),
 		"attribution":  p.Attribution,
+	}
+
+	if len(p.Filters) != 0 {
+		payload["filters"] = p.Filters
+	}
+
+	if len(p.Fields) != 0 {
+		payload["fields"] = p.Fields
 	}
 
 	return payload

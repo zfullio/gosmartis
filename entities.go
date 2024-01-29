@@ -311,7 +311,7 @@ func (p *Payload) convert() map[string]interface{} {
 		"datetimeFrom": p.DateTimeFrom.Format("2006-01-02"),
 		"datetimeTo":   p.DateTimeTo.Format("2006-01-02"),
 		"groupBy":      p.GroupBy,
-		"typeReport":   p.TypeReport,
+		"type":         p.TypeReport,
 		"filters":      p.Filters,
 		"fields":       strings.Join(p.Fields, ";"),
 		"attribution":  p.Attribution,

@@ -1,7 +1,6 @@
 package gosmartis
 
 import (
-	"encoding/json"
 	"strings"
 	"time"
 )
@@ -48,10 +47,6 @@ const (
 	TypeReportAggregated TypeReport = "aggregated"
 )
 
-type GetChannelsResponse struct {
-	Items []Channel `json:"channels"`
-}
-
 type Channel struct {
 	ID                  int         `json:"id"`
 	Title               string      `json:"title"`
@@ -73,10 +68,6 @@ type Channel struct {
 	UpdatedAt           *string     `json:"updated_at"`
 	DeletedAt           interface{} `json:"deleted_at"`
 	CategoryTitle       *string     `json:"category_title"`
-}
-
-type GetPlacementsResponse struct {
-	Items []Placement `json:"placements"`
 }
 
 type Placement struct {
@@ -107,10 +98,6 @@ type Placement struct {
 	} `json:"channel"`
 }
 
-type GetCampaignsResponse struct {
-	Items []Campaign `json:"campaigns"`
-}
-
 type Campaign struct {
 	Id          int     `json:"id"`
 	PlacementId int     `json:"placement_id"`
@@ -119,56 +106,40 @@ type Campaign struct {
 	UpdatedAt   *string `json:"updated_at"`
 }
 
-type GetKeywordsResponse struct {
-	Items []Keyword `json:"keywords"`
-}
-
 type Keyword struct {
 	ID      int    `json:"id"`
 	Keyword string `json:"keyword"`
 }
 
-type GetCrmCustomFieldsResponse struct {
-	Items []CrmCustomField `json:"crmCustomFields"`
-}
-
 type CrmCustomField struct {
 	ID                int    `json:"id"`
-	CRMAccountId      int    `json:"crm_account_id"`
-	ElementTypeId     int    `json:"element_type_id"`
+	CRMAccountID      int    `json:"crm_account_id"`
+	ElementTypeID     int    `json:"element_type_id"`
 	CustomFieldTitle  string `json:"custom_field_title"`
-	FieldTypeId       int    `json:"field_type_id"`
+	FieldTypeID       int    `json:"field_type_id"`
 	IsMultiple        int    `json:"is_multiple"`
-	GroupId           int    `json:"group_id"`
+	GroupID           int    `json:"group_id"`
 	Description       string `json:"description"`
 	Status            int    `json:"status"`
 	IsFilter          int    `json:"is_filter"`
-	FilterParamId     int    `json:"filter_param_id"`
+	FilterParamID     int    `json:"filter_param_id"`
 	DefaultVisibility int    `json:"default_visibility"`
-}
-
-type GetCrmCustomFieldGroupsResponse struct {
-	Items []CrmCustomFieldGroup `json:"crmCustomFieldGroups"`
 }
 
 type CrmCustomFieldGroup struct {
 	ID                int    `json:"id"`
 	Title             string `json:"title"`
-	CRMAccountId      int    `json:"crm_account_id"`
+	CRMAccountID      int    `json:"crm_account_id"`
 	DefaultVisibility int    `json:"default_visibility"`
 	Sort              int    `json:"sort"`
 }
 
-type GetAdsResponse struct {
-	Items []Ad `json:"ads"`
-}
-
 type Ad struct {
-	Id                 int         `json:"id"`
-	ExternalId         string      `json:"external_id"`
-	PlacementId        int         `json:"placement_id"`
-	CampaignId         int         `json:"campaign_id"`
-	ExternalCampaignId string      `json:"external_campaign_id"`
+	ID                 int         `json:"id"`
+	ExternalID         string      `json:"external_id"`
+	PlacementID        int         `json:"placement_id"`
+	CampaignID         int         `json:"campaign_id"`
+	ExternalCampaignID string      `json:"external_campaign_id"`
 	Type               string      `json:"type"`
 	Title              string      `json:"title"`
 	Text               string      `json:"text"`
@@ -180,12 +151,8 @@ type Ad struct {
 	CreatedAt          string      `json:"created_at"`
 }
 
-type GetProjectsResponse struct {
-	Projects []Project `json:"projects"`
-}
-
 type Project struct {
-	Id                   int    `json:"id"`
+	ID                   int    `json:"id"`
 	Project              string `json:"project"`
 	Title                string `json:"title"`
 	CreatedAt            int    `json:"created_at"`
@@ -198,30 +165,22 @@ type Project struct {
 	} `json:"project_fields"`
 }
 
-type GetMetricsResponse struct {
-	Metrics []Metric `json:"metrics"`
-}
-
 type Metric struct {
-	Id                 int     `json:"id"`
+	ID                 int     `json:"id"`
 	Code               string  `json:"code"`
 	Title              string  `json:"title"`
 	Description        *string `json:"description"`
-	CategoryId         int     `json:"category_id"`
+	CategoryID         int     `json:"category_id"`
 	CategoryTitle      string  `json:"category_title"`
 	CategorySort       int     `json:"category_sort"`
 	IsSystem           int     `json:"is_system"`
 	MParent            int     `json:"m_parent"`
-	ServiceId          int     `json:"service_id"`
+	ServiceID          int     `json:"service_id"`
 	IsGroup            *int    `json:"is_group"`
 	Formule            *string `json:"formule"`
 	Calculate          string  `json:"calculate"`
 	DateCreate         int     `json:"date_create"`
 	EnableOriginalData int     `json:"enable_original_data"`
-}
-
-type GetGroupingsResponse struct {
-	Groupings []Grouping
 }
 
 type Grouping struct {
@@ -233,51 +192,11 @@ type Grouping struct {
 	ClientId int    `json:"client_id"`
 }
 
-type GetAttributionsResponse struct {
-	Attributions []AttributionSmartis
-}
-
-func (g *GetAttributionsResponse) UnmarshalJSON(b []byte) error {
-	var data struct {
-		ModelAttributions map[string]struct {
-			ID       int    `json:"id"`
-			IsSystem int    `json:"is_system"`
-			About    string `json:"about"`
-			Title    string `json:"title"`
-		} `json:"modelAttributions"`
-	}
-
-	if err := json.Unmarshal(b, &data); err != nil {
-		return err
-	}
-
-	attributions := make([]AttributionSmartis, 0, len(data.ModelAttributions))
-	for _, v := range data.ModelAttributions {
-		var isSystem = v.IsSystem == 1
-		attributions = append(attributions, AttributionSmartis{
-			About:    v.About,
-			ID:       v.ID,
-			IsSystem: isSystem,
-			Title:    v.Title,
-		})
-	}
-	g.Attributions = attributions
-	return nil
-}
-
 type AttributionSmartis struct {
 	About    string `json:"about"`
 	ID       int    `json:"id"`
 	IsSystem bool   `json:"is_system"`
 	Title    string `json:"title"`
-}
-
-type GetReportsResponse struct {
-	Reports  map[string]interface{} `json:"reports"`
-	MetaInfo struct {
-		WorkTime int `json:"worktime"`
-	} `json:"metaInfo"`
-	Warnings []interface{} `json:"warnings"`
 }
 
 type Attribution struct {
@@ -324,37 +243,4 @@ func (p *Payload) convert() map[string]interface{} {
 	}
 
 	return payload
-}
-
-func (g *GetGroupingsResponse) UnmarshalJSON(b []byte) error {
-	var data struct {
-		Groupings map[string]struct {
-			ID       int    `json:"id"`
-			Title    string `json:"title"`
-			Code     string `json:"code"`
-			IsSystem bool   `json:"is_system"`
-			Sort     int    `json:"sort"`
-			ClientID int    `json:"client_id"`
-		} `json:"groupings"`
-	}
-
-	if err := json.Unmarshal(b, &data); err != nil {
-		return err
-	}
-
-	groupings := make([]Grouping, 0, len(data.Groupings))
-	for _, v := range data.Groupings {
-		groupings = append(groupings, Grouping{
-			Id:       v.ID,
-			Title:    v.Title,
-			Code:     v.Code,
-			IsSystem: v.IsSystem,
-			Sort:     v.Sort,
-			ClientId: v.ClientID,
-		})
-	}
-
-	g.Groupings = groupings
-
-	return nil
 }

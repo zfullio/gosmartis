@@ -121,10 +121,12 @@ func (c *Client) doRequest(ctx context.Context, method Method, data interface{})
 	return resp, nil
 }
 
-func (c *Client) GetReport(ctx context.Context, payload Payload) (GetReportsResponse, error) {
-	resp, err := c.doRequest(ctx, GetReports, payload.convert())
+func (c *Client) GetReport(ctx context.Context, payload Payload) ([]*Report, error) {
+	pay := payload.convert()
+
+	resp, err := c.doRequest(ctx, GetReports, pay)
 	if err != nil {
-		return GetReportsResponse{}, err
+		return nil, err
 	}
 
 	defer resp.Body.Close()
@@ -135,12 +137,63 @@ func (c *Client) GetReport(ctx context.Context, payload Payload) (GetReportsResp
 	}
 
 	data := GetReportsResponse{}
+
 	err = json.Unmarshal(respBody, &data)
 	if err != nil {
 		log.Printf("Error: %v", err)
 	}
 
-	return data, nil
+	if len(data.Reports) == 0 {
+		return nil, fmt.Errorf("no reports data")
+	}
+
+	reports := make([]*Report, 0, len(data.Reports))
+
+	for k, v := range data.Reports {
+
+		report, err := newReport(k, v)
+		if err != nil {
+			return nil, err
+		}
+
+		reports = append(reports, report)
+	}
+
+	return reports, nil
+}
+
+func newReport(metric string, data interface{}) (*Report, error) {
+	prepare, ok := data.([]interface{})
+	if !ok {
+		return nil, fmt.Errorf("invalid report data")
+	}
+	report := Report{
+		Metric:      metric,
+		RowsMassive: make([]Row, 0, len(prepare)),
+	}
+
+	for _, row := range prepare {
+		rowData := make([]*Cell, 0, len(row.(map[string]interface{})))
+
+		prepareRow, ok := row.(map[string]interface{})
+		if !ok {
+			return nil, fmt.Errorf("invalid report data")
+		}
+
+		for key, value := range prepareRow {
+			cell := Cell{
+				ColumnID: key,
+				Value:    value,
+				Name:     "",
+			}
+			cell.initType()
+			rowData = append(rowData, &cell)
+		}
+
+		report.RowsMassive = append(report.RowsMassive, rowData)
+	}
+
+	return &report, nil
 }
 
 // GetProjects retrieves a list of projects using the provided context.
